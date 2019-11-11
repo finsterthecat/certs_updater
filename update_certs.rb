@@ -22,10 +22,10 @@ def date_reformat(mmddyyyy)
 end
 
 #Update a cert in the hash if date is equal or later or insert if not found
-#"existing": found in certs but not in sf;
-#"new": found in sf but not in certs;
-#"confirmed": same cert and date found in sf and certs,
-#"updated": same cert and later date found in sf
+#:contingent: found in certs but not in sf;
+#:new: found in sf but not in certs;
+#:confirmed: same cert and date found in sf and certs,
+#:updated: same cert and later date found in sf
 #params: Hash: the hash to update, consultant, consultant_source = enum(:certs, :sf)
 def update_cert(hash, consultant, consultant_source = :certs)
     name = consultant[0].downcase
@@ -36,29 +36,29 @@ def update_cert(hash, consultant, consultant_source = :certs)
         src = 
             if consultant_source == :sf
                 if cert == nil
-                    "new"
-                elsif cert[2] == "existing"
+                    :new
+                elsif cert[2] == :contingent
                     if dt < cert[0]
-                        "older"
+                        :older
                     elsif dt == cert[0]
-                        "confirmed"
+                        :confirmed
                     else
-                        "updated"
+                        :updated
                     end
                 else
                     if dt < cert[0]
-                        "skip"
+                        :skip
                     elsif dt == cert[0]
                         cert[2]
                     else
-                        "updated"
+                        :updated
                     end
                 end
             else
-                "existing"
+                :contingent
             end
-        if src != "skip"
-            instance.store(consultant[1], [dt, consultant[3], src, src == "older" ? cert[0] : ""])
+        if src != :skip
+            instance.store(consultant[1], [dt, consultant[3], src, src == :older ? cert[0] : ""])
         end
     end
     hash.store(name , instance)       #Put cert list back for consultant
