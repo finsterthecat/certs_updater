@@ -26,6 +26,7 @@ end
 #:new: found in sf but not in certs;
 #:confirmed: same cert and date found in sf and certs,
 #:updated: same cert and later date found in sf
+#:older: same cert but earlier date in sf
 #params: Hash: the hash to update, consultant, consultant_source = enum(:certs, :sf)
 def update_cert(hash, consultant, consultant_source = :certs)
     name = consultant[0].downcase
@@ -45,14 +46,12 @@ def update_cert(hash, consultant, consultant_source = :certs)
                     else
                         :updated
                     end
+                elsif dt < cert[0]
+                    :skip
+                elsif dt == cert[0]
+                    cert[2]
                 else
-                    if dt < cert[0]
-                        :skip
-                    elsif dt == cert[0]
-                        cert[2]
-                    else
-                        :updated
-                    end
+                    :updated
                 end
             else
                 :contingent
